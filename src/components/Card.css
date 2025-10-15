@@ -113,3 +113,14 @@
   color: #90a4ae;
   font-family: monospace;
 }
+
+
+.card:nth-child(even) {
+  background: #93b0cc;
+  color: white;
+}
+
+.card:nth-child(odd) {
+  background: #ecf0f1;
+  color: #90b8a5;
+}
