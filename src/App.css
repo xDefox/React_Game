@@ -1,21 +1,6 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Существующие стили остаются */
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f5f7fa;
-  color: #333;
-  line-height: 1.6;
-}
-
-.App {
-  min-height: 100vh;
-  padding: 20px;
-}
-
+/* Новая шапка */
 .app-header {
   display: flex;
   justify-content: space-between;
@@ -23,50 +8,130 @@ body {
   margin-bottom: 30px;
   padding-bottom: 20px;
   border-bottom: 2px solid #e1e5e9;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
-.app-header h1 {
-  color: #2c3e50;
-  font-size: 2.2em;
-  font-weight: 300;
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
-.btn-add {
-  background: #4caf50;
+.user-info {
+  color: #666;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Кнопки авторизации */
+.btn-login {
+  background: #2196f3;
   color: white;
   border: none;
-  padding: 12px 24px;
+  padding: 10px 20px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 14px;
   transition: background-color 0.3s;
 }
 
-.btn-add:hover {
-  background: #45a049;
+.btn-login:hover {
+  background: #1976d2;
 }
 
-.cards-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 20px;
-  justify-items: center;
+.btn-logout {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.btn-logout:hover {
+  background: #d32f2f;
+}
+
+.btn-login-large {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+}
+
+.btn-login-large:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Сообщение приветствия */
+.welcome-message {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.welcome-message h2 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+.welcome-message p {
+  color: #546e7a;
+  font-size: 1.1em;
+}
+
+/* Загрузка */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  gap: 15px;
+}
+
+.loading-spinner {
+  font-size: 2em;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* Адаптивность */
 @media (max-width: 768px) {
   .app-header {
     flex-direction: column;
-    gap: 15px;
     text-align: center;
   }
-
-  .cards-container {
-    grid-template-columns: 1fr;
+  
+  .header-left {
+    align-items: center;
   }
-
-  .form-actions {
-    flex-direction: column;
+  
+  .header-actions {
+    justify-content: center;
   }
 }
