@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
-
-// Временный reducer (заглушка)
-const tempReducer = (state = {}) => state;
+import authReducer from './slices/authSlice'
+import cardsReducer from './slices/cardsSlice'
 
 const store = configureStore({
   reducer: {
-    temp: tempReducer, // временный reducer чтобы не было ошибок
+    auth: authReducer,
+    cards: cardsReducer,
   },
 })
 

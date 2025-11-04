@@ -1,63 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import Card from './components/Card';
-import AddCardForm from './components/AddCardForm';
-import LoginForm from './components/LoginForm';
+import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import Card from './components/Card';                    // ← правильный путь
+import AddCardForm from './components/AddCardForm';     // ← правильный путь  
+import LoginForm from './components/LoginForm';         // ← правильный путь
+import { addCard, deleteCard } from './store/slices/cardsSlice';
+import { login, logout } from './store/slices/authSlice';
 import './App.css';
 
 function App() {
-  const [cards, setCards] = useState([
-    {
-      id: '1',
-      title: 'Пример задачи',
-      description: 'Это пример карточки с описанием задачи или сущности',
-      tags: ['React', 'JavaScript'],
-      status: 'active',
-      date: '2024-01-15'
-    },
-    {
-      id: '2',
-      title: 'Вторая задача',
-      description: 'Еще одна карточка для демонстрации',
-      tags: ['CSS', 'UI'],
-      status: 'paused',
-      date: '2024-01-14'
-    }
-  ]);
-
+  const dispatch = useDispatch();
+  
+  // Берем данные из Redux store
+  const { user, isAuthenticated } = useSelector(state => state.auth);
+  const { items: cards } = useSelector(state => state.cards);
+  
   const [showForm, setShowForm] = useState(false);
-  const [showLogin, setShowLogin] = useState(true); // Показывать форму входа при запуске
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-      setShowLogin(false);
-    }
-    setIsLoading(false);
-  }, []);
+  const [showLogin, setShowLogin] = useState(!isAuthenticated);
 
   const handleLogin = (userData) => {
-    setUser(userData);
+    dispatch(login(userData));
     setShowLogin(false);
-    localStorage.setItem('user', JSON.stringify(userData));
   };
 
   const handleLogout = () => {
-    setUser(null);
+    dispatch(logout());
     setShowLogin(true);
-    localStorage.removeItem('user');
   };
 
   const handleAddCard = (newCard) => {
-    setCards(prev => [...prev, newCard]);
+    dispatch(addCard(newCard));
     setShowForm(false);
   };
 
   const handleDeleteCard = (cardId) => {
     if (window.confirm('Вы уверены, что хотите удалить эту карточку?')) {
-      setCards(prev => prev.filter(card => card.id !== cardId));
+      dispatch(deleteCard(cardId));
     }
   };
 
@@ -65,24 +42,14 @@ function App() {
     alert(`Редактирование карточки ID: ${cardId}`);
   };
 
-  if (isLoading) {
-    return (
-      <div className="loading-container">
-        <div className="loading-spinner">⏳</div>
-        <p>Загрузка...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="App">
-      {/* Шапка приложения */}
       <header className="app-header">
         <div className="header-left">
           <h1>Менеджер карточек</h1>
           {user && (
             <span className="user-info">
-              {user.username} ({user.role === 'admin' ? 'Админ' : 'Пользователь'})
+              {user.username} ({user.role === 'admin' ? ' Админ' : ' Пользователь'})
             </span>
           )}
         </div>
@@ -110,13 +77,12 @@ function App() {
               className="btn-login"
               onClick={() => setShowLogin(true)}
             >
-              Войти
+               Войти
             </button>
           )}
         </div>
       </header>
 
-      {/* Основной контент */}
       <main className="app-main">
         {user ? (
           <div className="cards-container">
@@ -137,13 +103,12 @@ function App() {
               className="btn-login-large"
               onClick={() => setShowLogin(true)}
             >
-              Войти в систему
+              🔑 Войти в систему
             </button>
           </div>
         )}
       </main>
 
-      {/* Модальные окна */}
       {showForm && user?.role === 'admin' && (
         <AddCardForm
           onAddCard={handleAddCard}
