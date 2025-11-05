@@ -1,40 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import Card from './components/Card';                    // ← правильный путь
-import AddCardForm from './components/AddCardForm';     // ← правильный путь  
-import LoginForm from './components/LoginForm';         // ← правильный путь
-import { addCard, deleteCard } from './store/slices/cardsSlice';
-import { login, logout } from './store/slices/authSlice';
+import Card from './components/Card';
+import AddCardForm from './components/AddCardForm';
+import LoginForm from './components/LoginForm';
+import { fetchCards, addNewCard, removeCard } from './store/slices/cardsSlice';
+import { loginUser, logout } from './store/slices/authSlice';  // ← добавил logout
 import './App.css';
 
 function App() {
   const dispatch = useDispatch();
   
   // Берем данные из Redux store
-  const { user, isAuthenticated } = useSelector(state => state.auth);
-  const { items: cards } = useSelector(state => state.cards);
+  const { user, isAuthenticated } = useSelector(state => state.auth);  // ← убрал authLoading
+  const { items: cards, isLoading: cardsLoading } = useSelector(state => state.cards);
   
   const [showForm, setShowForm] = useState(false);
   const [showLogin, setShowLogin] = useState(!isAuthenticated);
 
+  // useEffect для загрузки данных при монтировании
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchCards());
+    }
+  }, [isAuthenticated, dispatch]);
+
   const handleLogin = (userData) => {
-    dispatch(login(userData));
+    dispatch(loginUser(userData));
     setShowLogin(false);
   };
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logout());  // ← теперь logout определен
     setShowLogin(true);
   };
 
   const handleAddCard = (newCard) => {
-    dispatch(addCard(newCard));
+    dispatch(addNewCard(newCard));
     setShowForm(false);
   };
 
   const handleDeleteCard = (cardId) => {
     if (window.confirm('Вы уверены, что хотите удалить эту карточку?')) {
-      dispatch(deleteCard(cardId));
+      dispatch(removeCard(cardId));
     }
   };
 
@@ -60,16 +67,17 @@ function App() {
               <button 
                 className="btn-add"
                 onClick={() => setShowForm(true)}
-                disabled={user.role !== 'admin'}
+                disabled={user.role !== 'admin' || cardsLoading}
                 title={user.role !== 'admin' ? 'Только для администраторов' : ''}
               >
-                + Добавить карточку
+                {cardsLoading ? '' : '+'} Добавить карточку
               </button>
               <button 
                 className="btn-logout"
                 onClick={handleLogout}
+                disabled={cardsLoading}
               >
-                Выйти
+                 Выйти
               </button>
             </>
           ) : (
@@ -86,14 +94,21 @@ function App() {
       <main className="app-main">
         {user ? (
           <div className="cards-container">
-            {cards.map((card, index) => (
-              <Card
-                key={card.id}
-                item={card}
-                onDelete={user.role === 'admin' ? handleDeleteCard : null}
-                onEdit={handleEditCard}
-              />
-            ))}
+            {cardsLoading ? (
+              <div className="loading-message">
+                <div className="spinner">⏳</div>
+                <p>Загрузка карточек...</p>
+              </div>
+            ) : (
+              cards.map((card, index) => (
+                <Card
+                  key={card.id}
+                  item={card}
+                  onDelete={user.role === 'admin' ? handleDeleteCard : null}
+                  onEdit={handleEditCard}
+                />
+              ))
+            )}
           </div>
         ) : (
           <div className="welcome-message">

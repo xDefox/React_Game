@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { login } from '../store/slices/authSlice';  // ← исправлен путь (одна точка!)
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser, clearError } from '../store/slices/authSlice';
 import { CircularProgress, Box } from '@mui/material';
 import './LoginForm.css';
 
@@ -10,14 +10,18 @@ const LoginForm = ({ onLogin, onClose }) => {
     password: ''
   });
 
-  const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-
   const dispatch = useDispatch();
+  const { isLoading, error } = useSelector(state => state.auth);
+
+  // Очищаем ошибки при размонтировании
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     
     // Валидация
     const newErrors = {};
@@ -25,29 +29,12 @@ const LoginForm = ({ onLogin, onClose }) => {
     if (!formData.password) newErrors.password = 'Введите пароль';
     
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      setIsLoading(false);
+      // Можно добавить отображение этих ошибок
       return;
     }
 
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Используем Redux для логина
-      if (formData.username === 'admin' && formData.password === 'admin') {
-        dispatch(login({ username: formData.username, role: 'admin' }));
-        onLogin({ username: formData.username, role: 'admin' });
-      } else if (formData.username === 'user' && formData.password === 'user') {
-        dispatch(login({ username: formData.username, role: 'user' }));
-        onLogin({ username: formData.username, role: 'user' });
-      } else {
-        setErrors({ general: 'Неверное имя пользователя или пароль' });
-      }
-    } catch (error) {
-      setErrors({ general: 'Ошибка при авторизации' });
-    } finally {
-      setIsLoading(false);
-    }
+    // Используем async thunk из Redux
+    dispatch(loginUser(formData));
   };
 
   const handleChange = (e) => {
@@ -56,11 +43,8 @@ const LoginForm = ({ onLogin, onClose }) => {
       ...prev,
       [name]: value
     }));
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-    if (errors.general) {
-      setErrors(prev => ({ ...prev, general: '' }));
+    if (error) {
+      dispatch(clearError());
     }
   };
 
@@ -73,9 +57,9 @@ const LoginForm = ({ onLogin, onClose }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
-          {errors.general && (
+          {error && (
             <div className="error-message general-error">
-               {errors.general}
+              ⚠️ {error}
             </div>
           )}
 
@@ -88,12 +72,8 @@ const LoginForm = ({ onLogin, onClose }) => {
               value={formData.username}
               onChange={handleChange}
               placeholder="Введите имя пользователя"
-              className={errors.username ? 'error' : ''}
               disabled={isLoading}
             />
-            {errors.username && (
-              <span className="error-message">{errors.username}</span>
-            )}
           </div>
 
           <div className="form-group">
@@ -105,12 +85,8 @@ const LoginForm = ({ onLogin, onClose }) => {
               value={formData.password}
               onChange={handleChange}
               placeholder="Введите пароль"
-              className={errors.password ? 'error' : ''}
               disabled={isLoading}
             />
-            {errors.password && (
-              <span className="error-message">{errors.password}</span>
-            )}
           </div>
 
           <div className="form-actions">
@@ -128,15 +104,15 @@ const LoginForm = ({ onLogin, onClose }) => {
                   <span>Вход...</span>
                 </Box>
               ) : (
-                ' Войти'
+                '🔑 Войти'
               )}
             </button>
           </div>
 
           <div className="login-hint">
             <p><strong>Тестовые аккаунты:</strong></p>
-            <p> Админ: <code>admin</code> / <code>admin</code></p>
-            <p>Пользователь: <code>user</code> / <code>user</code></p>
+            <p>👑 Админ: <code>admin</code> / <code>admin</code></p>
+            <p>👤 Пользователь: <code>user</code> / <code>user</code></p>
           </div>
         </form>
       </div>
