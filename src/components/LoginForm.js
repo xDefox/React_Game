@@ -1,17 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { loginUser, clearError } from '../store/slices/authSlice';
 import { CircularProgress, Box } from '@mui/material';
 import './LoginForm.css';
 
-const LoginForm = ({ onLogin, onClose }) => {
+const LoginForm = () => {
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   });
 
   const dispatch = useDispatch();
-  const { isLoading, error } = useSelector(state => state.auth);
+  const navigate = useNavigate();
+  const { isLoading, error, isAuthenticated } = useSelector(state => state.auth);
+
+  // Редирект после успешного логина
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
 
   // Очищаем ошибки при размонтировании
   useEffect(() => {
@@ -29,11 +38,9 @@ const LoginForm = ({ onLogin, onClose }) => {
     if (!formData.password) newErrors.password = 'Введите пароль';
     
     if (Object.keys(newErrors).length > 0) {
-      // Можно добавить отображение этих ошибок
       return;
     }
 
-    // Используем async thunk из Redux
     dispatch(loginUser(formData));
   };
 
@@ -49,17 +56,16 @@ const LoginForm = ({ onLogin, onClose }) => {
   };
 
   return (
-    <div className="login-overlay">
-      <div className="login-container">
+    <div className="login-form-container">
+      <div className="login-form-wrapper">
         <div className="login-header">
           <h2>Вход в систему</h2>
-          <button className="btn-close" onClick={onClose} disabled={isLoading}>×</button>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
           {error && (
             <div className="error-message general-error">
-              ⚠️ {error}
+               {error}
             </div>
           )}
 
@@ -104,15 +110,15 @@ const LoginForm = ({ onLogin, onClose }) => {
                   <span>Вход...</span>
                 </Box>
               ) : (
-                '🔑 Войти'
+                ' Войти'
               )}
             </button>
           </div>
 
           <div className="login-hint">
             <p><strong>Тестовые аккаунты:</strong></p>
-            <p>👑 Админ: <code>admin</code> / <code>admin</code></p>
-            <p>👤 Пользователь: <code>user</code> / <code>user</code></p>
+            <p> Админ: <code>admin</code> / <code>admin</code></p>
+            <p> Пользователь: <code>user</code> / <code>user</code></p>
           </div>
         </form>
       </div>
