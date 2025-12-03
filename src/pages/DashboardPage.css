@@ -2,7 +2,14 @@
 .dashboard-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 20px;
+  padding: 0;
+  position: relative;
+}
+
+/* Когда форма открыта - затемняем основной контент */
+.dashboard-page.form-open .dashboard-main {
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 .app-header {
@@ -11,7 +18,7 @@
   align-items: center;
   background: white;
   padding: 20px 30px;
-  border-radius: 12px;
+  border-radius: 0 0 12px 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   margin-bottom: 25px;
 }
@@ -49,12 +56,12 @@
 }
 
 .btn-add {
-  background: #4a6fa5;
+  background: #4CAF50;
   color: white;
 }
 
 .btn-add:hover:not(:disabled) {
-  background: #3a5a80;
+  background: #45a049;
   transform: translateY(-2px);
 }
 
@@ -73,12 +80,11 @@
   transform: translateY(-2px);
 }
 
-/* Панель фильтров */
 .filter-panel {
   background: white;
   padding: 20px;
   border-radius: 12px;
-  margin-bottom: 25px;
+  margin: 0 25px 25px 25px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -109,9 +115,8 @@
   border-color: #4a6fa5;
 }
 
-/* Контейнер карточек */
 .dashboard-main {
-  padding: 20px 0;
+  padding: 20px;
 }
 
 .cards-container {
@@ -140,7 +145,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* Адаптивность */
 @media (max-width: 768px) {
   .app-header {
     flex-direction: column;

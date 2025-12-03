@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AddCardForm.css';
 
 const AddCardForm = ({ onAddCard, onCancel }) => {
@@ -12,7 +12,14 @@ const AddCardForm = ({ onAddCard, onCancel }) => {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
 
-  // Валидационные правила
+  // Добавляем класс к body при открытии формы
+  useEffect(() => {
+    document.body.classList.add('form-open');
+    return () => {
+      document.body.classList.remove('form-open');
+    };
+  }, []);
+
   const validateField = (name, value) => {
     switch (name) {
       case 'title':
@@ -55,7 +62,6 @@ const AddCardForm = ({ onAddCard, onCancel }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Отмечаем все поля как "тронутые" при отправке
     const allTouched = {};
     Object.keys(formData).forEach(key => {
       allTouched[key] = true;
@@ -110,7 +116,6 @@ const AddCardForm = ({ onAddCard, onCancel }) => {
   const handleBlur = (e) => {
     const { name, value } = e.target;
     
-    // Отмечаем поле как "тронутое"
     setTouched(prev => ({
       ...prev,
       [name]: true
@@ -123,15 +128,15 @@ const AddCardForm = ({ onAddCard, onCancel }) => {
     }));
   };
 
-  // Проверка, можно ли отправить форму
   const isFormValid = () => {
     return Object.keys(validateForm()).length === 0;
   };
 
   return (
-    <div className="form-overlay">
+    <>
+      <div className="form-overlay" onClick={onCancel} />
       <div className="form-container">
-        <h2> Добавить новую карточку</h2>
+        <h2>Добавить новую карточку</h2>
         
         <form onSubmit={handleSubmit} className="card-form" noValidate>
           <div className="form-group">
@@ -150,7 +155,7 @@ const AddCardForm = ({ onAddCard, onCancel }) => {
               required
             />
             {errors.title && touched.title && (
-              <div className="error-message"> {errors.title}</div>
+              <div className="error-message">{errors.title}</div>
             )}
             <div className="character-count">
               {formData.title.length}/50 символов
@@ -172,7 +177,7 @@ const AddCardForm = ({ onAddCard, onCancel }) => {
               className={`form-textarea ${errors.description && touched.description ? 'error' : ''}`}
             />
             {errors.description && touched.description && (
-              <div className="error-message"> {errors.description}</div>
+              <div className="error-message">{errors.description}</div>
             )}
             <div className="character-count">
               {formData.description.length}/500 символов
@@ -218,15 +223,6 @@ const AddCardForm = ({ onAddCard, onCancel }) => {
             </select>
           </div>
 
-          <div className="form-summary">
-            <h4>📋 Сводка:</h4>
-            <ul>
-              <li>Заголовок: {formData.title || 'не указан'}</li>
-              <li>Теги: {formData.tags ? formData.tags.split(',').length : 0} шт.</li>
-              <li>Статус: {formData.status === 'active' ? 'Активно' : formData.status === 'paused' ? 'На паузе' : 'Завершено'}</li>
-            </ul>
-          </div>
-
           <div className="form-actions">
             <button 
               type="button" 
@@ -245,7 +241,7 @@ const AddCardForm = ({ onAddCard, onCancel }) => {
           </div>
         </form>
       </div>
-    </div>
+    </>
   );
 };
 

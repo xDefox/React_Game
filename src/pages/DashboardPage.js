@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import { fetchCards } from '../store/slices/cardsSlice';
+import { fetchCards, addNewCard, removeCard, updateCard } from '../store/slices/cardsSlice';
 import Card from '../components/Card';
 import AddCardForm from '../components/AddCardForm';
-import { addNewCard, removeCard } from '../store/slices/cardsSlice';
+import EditCardForm from '../components/EditCardForm';
+import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 import { logout } from '../store/slices/authSlice';
 import './DashboardPage.css';
 
@@ -12,7 +13,13 @@ const DashboardPage = () => {
   const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector(state => state.auth);
   const { items: cards, isLoading } = useSelector(state => state.cards);
-  const [showForm, setShowForm] = React.useState(false);
+  
+  const [showForm, setShowForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [editingCard, setEditingCard] = useState(null);
+  const [deletingCard, setDeletingCard] = useState(null);
+  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -20,7 +27,6 @@ const DashboardPage = () => {
     }
   }, [isAuthenticated, dispatch]);
 
-  // Если не авторизован - редирект на логин
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -30,23 +36,58 @@ const DashboardPage = () => {
   };
 
   const handleAddCard = (newCard) => {
-    dispatch(addNewCard(newCard)); 
-    setShowForm(false);
+    dispatch(addNewCard({
+      ...newCard,
+      author: user.username,
+      status: 'active',
+      count: 0,
+      isMine: true
+    }));
   };
 
-  const handleDeleteCard = (cardId) => {
-    if (window.confirm('Удалить карточку?')) {
-      dispatch(removeCard(cardId)); 
+  const handleDeleteClick = (card) => {
+    setDeletingCard(card);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingCard) {
+      dispatch(removeCard(deletingCard.id));
+      setShowDeleteModal(false);
+      setDeletingCard(null);
     }
   };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setDeletingCard(null);
+  };
+
+  const handleEditCard = (card) => {
+    setEditingCard(card);
+    setShowEditForm(true);
+  };
+
+  const handleUpdateCard = (updatedCard) => {
+    dispatch(updateCard(updatedCard));
+    setShowEditForm(false);
+    setEditingCard(null);
+  };
+
+  const filteredCards = cards.filter(card => {
+    if (filter === 'my') return card.author === user.username || card.isMine;
+    if (filter === 'active') return card.status === 'active';
+    if (filter === 'archived') return card.status === 'archived';
+    return true;
+  });
 
   return (
     <div className="dashboard-page">
       <header className="app-header">
         <div className="header-left">
-          <h1> Менеджер карточек</h1>
+          <h1>Менеджер карточек</h1>
           <span className="user-info">
-            {user.username} ({user.role === 'admin' ? ' Админ' : ' Пользователь'})
+            {user.username} ({user.role === 'admin' ? 'Админ' : 'Пользователь'})
           </span>
         </div>
         
@@ -59,10 +100,50 @@ const DashboardPage = () => {
             + Добавить карточку
           </button>
           <button className="btn-logout" onClick={handleLogout}>
-             Выйти
+            Выйти
           </button>
         </div>
       </header>
+
+      <div className="filter-panel">
+        <div className="filter-buttons">
+          <button 
+            className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
+            onClick={() => setFilter('all')}
+          >
+            Все карточки
+          </button>
+          <button 
+            className={`filter-btn ${filter === 'my' ? 'active' : ''}`}
+            onClick={() => setFilter('my')}
+          >
+            Мои карточки
+          </button>
+          <button 
+            className={`filter-btn ${filter === 'active' ? 'active' : ''}`}
+            onClick={() => setFilter('active')}
+          >
+            Активные
+          </button>
+          <button 
+            className={`filter-btn ${filter === 'archived' ? 'active' : ''}`}
+            onClick={() => setFilter('archived')}
+          >
+            Архив
+          </button>
+        </div>
+      </div>
+
+      {/* ФОРМА ДОБАВЛЕНИЯ КАРТОЧКИ - ПОЯВЛЯЕТСЯ ПОВЕРХ */}
+      {showForm && (
+        <AddCardForm
+          onAddCard={(newCard) => {
+            handleAddCard(newCard);
+            setShowForm(false);
+          }}
+          onCancel={() => setShowForm(false)}
+        />
+      )}
 
       <main className="dashboard-main">
         {isLoading ? (
@@ -72,24 +153,38 @@ const DashboardPage = () => {
           </div>
         ) : (
           <div className="cards-container">
-            {cards.map((card, index) => (
+            {filteredCards.map((card) => (
               <Card
                 key={card.id}
                 item={card}
-                onDelete={user.role === 'admin' ? handleDeleteCard : null}
-                onEdit={() => console.log('Edit:', card.id)}
+                onDelete={user.role === 'admin' ? () => handleDeleteClick(card) : null}
+                onEdit={() => handleEditCard(card)}
+                canEdit={user.role === 'admin' || card.author === user.username}
               />
             ))}
           </div>
         )}
       </main>
 
-      {showForm && (
-        <AddCardForm
-          onAddCard={handleAddCard}
-          onCancel={() => setShowForm(false)}
+      {/* МОДАЛКА РЕДАКТИРОВАНИЯ */}
+      {showEditForm && editingCard && (
+        <EditCardForm
+          card={editingCard}
+          onUpdateCard={handleUpdateCard}
+          onCancel={() => {
+            setShowEditForm(false);
+            setEditingCard(null);
+          }}
         />
       )}
+
+      {/* МОДАЛКА ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ */}
+      <DeleteConfirmationModal
+        open={showDeleteModal}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        cardTitle={deletingCard?.title}
+      />
     </div>
   );
 };
