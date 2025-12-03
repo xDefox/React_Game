@@ -1,20 +1,24 @@
+/* Card.css */
 .card {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e1e5e9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  margin: 10px;
-  transition: all 0.3s ease;
-  max-width: 350px;
-  min-height: 200px;
-  display: flex;
-  flex-direction: column;
+  margin: 15px;
+  width: 300px;
+  border-left: 5px solid #4a6fa5;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card.my-card {
+  border-left-color: #ff6b6b;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
 }
 
 .card-header {
@@ -22,14 +26,14 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 15px;
-  border-bottom: 1px solid #f0f0f0;
   padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
 }
 
 .card-title {
   margin: 0;
   color: #2c3e50;
-  font-size: 1.3em;
+  font-size: 18px;
   font-weight: 600;
   flex: 1;
 }
@@ -45,82 +49,118 @@
   cursor: pointer;
   padding: 5px;
   border-radius: 4px;
-  transition: background-color 0.2s;
   font-size: 16px;
+  transition: background-color 0.2s;
 }
 
 .btn-edit:hover {
   background-color: #e3f2fd;
+  color: #1976d2;
 }
 
 .btn-delete:hover {
   background-color: #ffebee;
+  color: #d32f2f;
 }
 
 .card-content {
-  flex: 1;
   margin-bottom: 15px;
 }
 
 .card-description {
   color: #546e7a;
+  font-size: 14px;
   line-height: 1.5;
-  margin-bottom: 12px;
+  margin-bottom: 15px;
+  min-height: 60px;
 }
 
 .card-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
-  margin-bottom: 10px;
+  gap: 8px;
+  margin-bottom: 15px;
 }
 
 .tag {
   background: #e3f2fd;
   color: #1976d2;
-  padding: 4px 8px;
-  border-radius: 16px;
-  font-size: 0.8em;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
   font-weight: 500;
 }
 
 .card-date {
   color: #78909c;
-  font-size: 0.9em;
-  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .card-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 12px;
-  border-top: 1px solid #f0f0f0;
-  font-size: 0.9em;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.card-status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .card-status.active {
+  background: #e8f5e9;
   color: #2e7d32;
-  font-weight: 500;
 }
 
 .card-status.paused {
-  color: #f57c00;
-  font-weight: 500;
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.card-status.archived {
+  background: #f5f5f5;
+  color: #757575;
 }
 
 .card-id {
-  color: #90a4ae;
+  color: #b0bec5;
+  font-size: 12px;
   font-family: monospace;
 }
 
-
-.card:nth-child(even) {
-  background: #93b0cc;
+/* Бейдж "Моя карточка!" */
+.my-card-badge {
+  position: absolute;
+  top: -10px;
+  right: 15px;
+  background: #ff6b6b;
   color: white;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(255, 107, 107, 0.3);
 }
 
-.card:nth-child(odd) {
-  background: #ecf0f1;
-  color: #90b8a5;
+/* Счетчик как на скриншоте */
+.card-count {
+  position: absolute;
+  bottom: 15px;
+  right: 20px;
+  background: #4a6fa5;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
 }

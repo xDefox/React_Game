@@ -9,11 +9,18 @@ const Layout = ({ children }) => {
 
   return (
     <div className="layout">
+      {/* ВЕРХНЯЯ СТРОКА - ТОЛЬКО ПРИВЕТСТВИЕ */}
+      <div className="top-header-line">
+        {isAuthenticated && (
+          <div className="user-greeting-line">
+            <span className="my-cards-badge">Мои карточки</span>
+            <span className="greeting-text">Привет, {user?.username}!</span>
+          </div>
+        )}
+      </div>
+
+      {/* ПРОСТОЙ НАВБАР БЕЗ "Менеджер карточек" */}
       <nav className="navbar">
-        <div className="nav-brand">
-          <Link to="/"> Менеджер карточек</Link>
-        </div>
-        
         <div className="nav-links">
           {isAuthenticated ? (
             <>
@@ -21,10 +28,10 @@ const Layout = ({ children }) => {
                 to="/" 
                 className={location.pathname === '/' ? 'active' : ''}
               >
-                 Мои карточки
+                📋 Мои карточки
               </Link>
               <span className="user-welcome">
-                Привет, {user?.username}!
+                👤 {user?.username}
               </span>
             </>
           ) : (
