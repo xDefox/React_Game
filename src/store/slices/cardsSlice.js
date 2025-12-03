@@ -1,11 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
-// 1. Создаем async thunk для загрузки карточек
 export const fetchCards = createAsyncThunk(
   'cards/fetchCards',
   async (_, { rejectWithValue }) => {
     try {
-      // Имитация REST API запроса
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // В реальном приложении здесь был бы fetch/axios
@@ -35,7 +33,6 @@ export const fetchCards = createAsyncThunk(
   }
 );
 
-// 2. Создаем async thunk для добавления карточки
 export const addNewCard = createAsyncThunk(
   'cards/addNewCard',
   async (cardData, { rejectWithValue }) => {
@@ -56,7 +53,6 @@ export const addNewCard = createAsyncThunk(
   }
 );
 
-// 3. Создаем async thunk для удаления карточки
 export const removeCard = createAsyncThunk(
   'cards/removeCard',
   async (cardId, { rejectWithValue }) => {
@@ -83,7 +79,6 @@ const cardsSlice = createSlice({
       state.error = null;
     }
   },
-  // 4. Используем builder для обработки async thunks
   extraReducers: (builder) => {
     builder
       // Обработка fetchCards

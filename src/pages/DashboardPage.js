@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { fetchCards } from '../store/slices/cardsSlice';
 import Card from '../components/Card';
 import AddCardForm from '../components/AddCardForm';
+import { addNewCard, removeCard } from '../store/slices/cardsSlice';
 import { logout } from '../store/slices/authSlice';
 import './DashboardPage.css';
 
@@ -29,14 +30,13 @@ const DashboardPage = () => {
   };
 
   const handleAddCard = (newCard) => {
-    // Будет через Redux
-    console.log('Add card:', newCard);
+    dispatch(addNewCard(newCard)); 
     setShowForm(false);
   };
 
   const handleDeleteCard = (cardId) => {
     if (window.confirm('Удалить карточку?')) {
-      console.log('Delete card:', cardId);
+      dispatch(removeCard(cardId)); 
     }
   };
 
