@@ -1,12 +1,32 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
+
+const loadCardsFromStorage = () => {
+  try {
+    const cards = localStorage.getItem('cards');
+    return cards ? JSON.parse(cards) : [];
+  } catch {
+    return [];
+  }
+};
+
+// Функция для сохранения карточек в localStorage
+const saveCardsToStorage = (cards) => {
+  localStorage.setItem('cards', JSON.stringify(cards));
+};
+
 export const fetchCards = createAsyncThunk(
   'cards/fetchCards',
   async (_, { rejectWithValue }) => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // В реальном приложении здесь был бы fetch/axios
+
+      const storedCards = loadCardsFromStorage();
+      if (storedCards.length > 0) {
+        return storedCards;
+      }
+
       const mockCards = [
         {
           id: '1',
@@ -14,7 +34,10 @@ export const fetchCards = createAsyncThunk(
           description: 'Это пример карточки с описанием задачи или сущности',
           tags: ['React', 'JavaScript'],
           status: 'active',
-          date: '2024-01-15'
+          date: '2024-01-15',
+          author: 'admin',
+          isMine: true,
+          count: 19
         },
         {
           id: '2',
@@ -22,9 +45,15 @@ export const fetchCards = createAsyncThunk(
           description: 'Еще одна карточка для демонстрации',
           tags: ['CSS', 'UI'],
           status: 'paused',
-          date: '2024-01-14'
+          date: '2024-01-14',
+          author: 'user',
+          isMine: false,
+          count: 5
         }
       ];
+      
+
+      saveCardsToStorage(mockCards);
       
       return mockCards;
     } catch (error) {
@@ -35,9 +64,8 @@ export const fetchCards = createAsyncThunk(
 
 export const addNewCard = createAsyncThunk(
   'cards/addNewCard',
-  async (cardData, { rejectWithValue }) => {
+  async (cardData, { rejectWithValue, getState }) => {
     try {
-      // Имитация API запроса
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const newCard = {
@@ -45,6 +73,11 @@ export const addNewCard = createAsyncThunk(
         id: Date.now().toString(),
         date: new Date().toISOString()
       };
+      
+
+      const currentCards = getState().cards.items;
+      const updatedCards = [...currentCards, newCard];
+      saveCardsToStorage(updatedCards);
       
       return newCard;
     } catch (error) {
@@ -55,10 +88,15 @@ export const addNewCard = createAsyncThunk(
 
 export const removeCard = createAsyncThunk(
   'cards/removeCard',
-  async (cardId, { rejectWithValue }) => {
+  async (cardId, { rejectWithValue, getState }) => {
     try {
-      // Имитация API запроса
       await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Обновляем localStorage
+      const currentCards = getState().cards.items;
+      const updatedCards = currentCards.filter(card => card.id !== cardId);
+      saveCardsToStorage(updatedCards);
+      
       return cardId;
     } catch (error) {
       return rejectWithValue('Ошибка при удалении карточки');
@@ -66,22 +104,41 @@ export const removeCard = createAsyncThunk(
   }
 );
 
+export const updateCard = createAsyncThunk(
+  'cards/updateCard',
+  async ({ id, ...updates }, { rejectWithValue, getState }) => {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      const currentCards = getState().cards.items;
+      const updatedCards = currentCards.map(card =>
+        card.id === id ? { ...card, ...updates } : card
+      );
+      
+      saveCardsToStorage(updatedCards);
+      
+      return { id, ...updates };
+    } catch (error) {
+      return rejectWithValue('Ошибка при обновлении карточки');
+    }
+  }
+);
+
+//загрузка отображения карточки
 const cardsSlice = createSlice({
   name: 'cards',
   initialState: {
-    items: [],
+    items: loadCardsFromStorage(), 
     isLoading: false,
     error: null
   },
   reducers: {
-    // Оставляем синхронные actions для простых операций
     clearError: (state) => {
       state.error = null;
     }
   },
   extraReducers: (builder) => {
     builder
-      // Обработка fetchCards
       .addCase(fetchCards.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -95,7 +152,6 @@ const cardsSlice = createSlice({
         state.error = action.payload;
       })
       
-      // Обработка addNewCard
       .addCase(addNewCard.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -103,13 +159,13 @@ const cardsSlice = createSlice({
       .addCase(addNewCard.fulfilled, (state, action) => {
         state.isLoading = false;
         state.items.push(action.payload);
+        // localStorage уже обновлен в thunk
       })
       .addCase(addNewCard.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
       
-      // Обработка removeCard
       .addCase(removeCard.pending, (state) => {
         state.isLoading = true;
       })
@@ -120,6 +176,14 @@ const cardsSlice = createSlice({
       .addCase(removeCard.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+      })
+      
+      // Обработка updateCard
+      .addCase(updateCard.fulfilled, (state, action) => {
+        const index = state.items.findIndex(card => card.id === action.payload.id);
+        if (index !== -1) {
+          state.items[index] = { ...state.items[index], ...action.payload };
+        }
       });
   }
 });

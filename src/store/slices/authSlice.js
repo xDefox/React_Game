@@ -1,5 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
+// Проверяем localStorage при инициализации
+const loadFromStorage = () => {
+  try {
+    const user = localStorage.getItem('auth_user');
+    return user ? JSON.parse(user) : null;
+  } catch {
+    return null;
+  }
+};
+
 // Async thunk для авторизации
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
@@ -24,16 +34,17 @@ export const loginUser = createAsyncThunk(
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    user: null,
+    user: loadFromStorage(), // Загружаем из localStorage
     isLoading: false,
     error: null,
-    isAuthenticated: false
+    isAuthenticated: !!loadFromStorage() // Проверяем, есть ли пользователь
   },
   reducers: {
     logout: (state) => {
       state.user = null;
       state.isAuthenticated = false;
       state.error = null;
+      localStorage.removeItem('auth_user'); // Удаляем из localStorage
     },
     clearError: (state) => {
       state.error = null;
@@ -51,6 +62,9 @@ const authSlice = createSlice({
         state.user = action.payload;
         state.isAuthenticated = true;
         state.error = null;
+        
+        // Сохраняем в localStorage
+        localStorage.setItem('auth_user', JSON.stringify(action.payload));
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
