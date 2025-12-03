@@ -1,78 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
 import { loginUser, clearError } from '../store/slices/authSlice';
 import { CircularProgress, Box } from '@mui/material';
 import './LoginForm.css';
 
 const LoginForm = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    password: ''
-  });
-  const [localErrors, setLocalErrors] = useState({}); // ← ДОБАВИЛИ локальное состояние для ошибок валидации
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isLoading, error, isAuthenticated } = useSelector(state => state.auth);
 
-  // Редирект после успешного логина
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/');
     }
   }, [isAuthenticated, navigate]);
 
-  // Очищаем ошибки при размонтировании
   useEffect(() => {
     return () => {
       dispatch(clearError());
     };
   }, [dispatch]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    const formErrors = {};
-    
-    if (!formData.username.trim()) {
-      formErrors.username = 'Введите имя пользователя';
-    } else if (formData.username.length < 3) {
-      formErrors.username = 'Минимум 3 символа';
-    }
-    
-    if (!formData.password) {
-      formErrors.password = 'Введите пароль';
-    } else if (formData.password.length < 4) {
-      formErrors.password = 'Минимум 4 символа';
-    }
-    
-    if (Object.keys(formErrors).length > 0) {
-      setLocalErrors(formErrors); // ← Исправлено: было setErrors, стало setLocalErrors
-      return;
-    }
-    
-    // Если валидация прошла, очищаем локальные ошибки и вызываем действие Redux
-    setLocalErrors({});
-    dispatch(loginUser(formData));
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    // Очищаем ошибку для конкретного поля при изменении
-    if (localErrors[name]) {
-      setLocalErrors(prev => ({ ...prev, [name]: '' }));
-    }
-    
-    if (error) {
-      dispatch(clearError());
-    }
-  };
+  //валидахтунг
+  const validationSchema = Yup.object({
+    username: Yup.string()
+      .required('Введите имя пользователя')
+      .min(3, 'Минимум 3 символа'),
+    password: Yup.string()
+      .required('Введите пароль')
+      .min(4, 'Минимум 4 символа')
+  });
 
   return (
     <div className="login-form-container">
@@ -81,75 +41,81 @@ const LoginForm = () => {
           <h2>Вход в систему</h2>
         </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          {error && (
-            <div className="error-message general-error">
-              {error}
-            </div>
-          )}
-
-          <div className="form-group">
-            <label htmlFor="username">Имя пользователя</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Введите имя пользователя"
-              disabled={isLoading}
-            />
-            {localErrors.username && (
-              <div className="error-message field-error">
-                {localErrors.username}
-              </div>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Пароль</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Введите пароль"
-              disabled={isLoading}
-            />
-            {localErrors.password && (
-              <div className="error-message field-error">
-                {localErrors.password}
-              </div>
-            )}
-          </div>
-
-          <div className="form-actions">
-            <button 
-              type="submit" 
-              className="btn-login"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                  <CircularProgress 
-                    size={20} 
-                    sx={{ color: 'white' }} 
-                  />
-                  <span>Вход...</span>
-                </Box>
-              ) : (
-                ' Войти'
+        <Formik
+          initialValues={{ username: '', password: '' }}
+          validationSchema={validationSchema}
+          onSubmit={(values) => {
+            dispatch(loginUser(values));
+          }}
+        >
+          {({ errors, touched }) => (
+            <Form className="login-form">
+              {error && (
+                <div className="error-message general-error">
+                  {error}
+                </div>
               )}
-            </button>
-          </div>
 
-          <div className="login-hint">
-            <p><strong>Тестовые аккаунты:</strong></p>
-            <p> Админ: <code>admin</code> / <code>admin</code></p>
-            <p> Пользователь: <code>user</code> / <code>user</code></p>
-          </div>
-        </form>
+              <div className="form-group">
+                <label htmlFor="username">Имя пользователя</label>
+                <Field
+                  type="text"
+                  id="username"
+                  name="username"
+                  placeholder="Введите имя пользователя"
+                  disabled={isLoading}
+                />
+                {errors.username && touched.username && (
+                  <div className="error-message">
+                    {errors.username}
+                  </div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="password">Пароль</label>
+                <Field
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="Введите пароль"
+                  disabled={isLoading}
+                />
+                {errors.password && touched.password && (
+                  <div className="error-message">
+                    {errors.password}
+                  </div>
+                )}
+              </div>
+
+              <div className="form-actions">
+                <button 
+                  type="submit" 
+                  className="btn-login"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                      <CircularProgress 
+                        size={20} 
+                        sx={{ color: 'white' }} 
+                      />
+                      <span>Вход...</span>
+                    </Box>
+                  ) : (
+                    'Войти'
+                  )}
+                </button>
+              </div>
+
+              <div className="login-hint">
+                <p><strong>Тестовые аккаунты:</strong></p>
+                <p>Админ: <code>admin</code> / <code>admin</code></p>
+                <p>Пользователь: <code>user</code> / <code>user</code></p>
+              </div>
+            </Form>
+          )}
+        </Formik>
       </div>
     </div>
   );
