@@ -10,6 +10,7 @@ const LoginForm = () => {
     username: '',
     password: ''
   });
+  const [localErrors, setLocalErrors] = useState({}); // ← ДОБАВИЛИ локальное состояние для ошибок валидации
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -32,15 +33,27 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Валидация
-    const newErrors = {};
-    if (!formData.username.trim()) newErrors.username = 'Введите имя пользователя';
-    if (!formData.password) newErrors.password = 'Введите пароль';
+    const formErrors = {};
     
-    if (Object.keys(newErrors).length > 0) {
+    if (!formData.username.trim()) {
+      formErrors.username = 'Введите имя пользователя';
+    } else if (formData.username.length < 3) {
+      formErrors.username = 'Минимум 3 символа';
+    }
+    
+    if (!formData.password) {
+      formErrors.password = 'Введите пароль';
+    } else if (formData.password.length < 4) {
+      formErrors.password = 'Минимум 4 символа';
+    }
+    
+    if (Object.keys(formErrors).length > 0) {
+      setLocalErrors(formErrors); // ← Исправлено: было setErrors, стало setLocalErrors
       return;
     }
-
+    
+    // Если валидация прошла, очищаем локальные ошибки и вызываем действие Redux
+    setLocalErrors({});
     dispatch(loginUser(formData));
   };
 
@@ -50,6 +63,12 @@ const LoginForm = () => {
       ...prev,
       [name]: value
     }));
+    
+    // Очищаем ошибку для конкретного поля при изменении
+    if (localErrors[name]) {
+      setLocalErrors(prev => ({ ...prev, [name]: '' }));
+    }
+    
     if (error) {
       dispatch(clearError());
     }
@@ -65,7 +84,7 @@ const LoginForm = () => {
         <form onSubmit={handleSubmit} className="login-form">
           {error && (
             <div className="error-message general-error">
-               {error}
+              {error}
             </div>
           )}
 
@@ -80,6 +99,11 @@ const LoginForm = () => {
               placeholder="Введите имя пользователя"
               disabled={isLoading}
             />
+            {localErrors.username && (
+              <div className="error-message field-error">
+                {localErrors.username}
+              </div>
+            )}
           </div>
 
           <div className="form-group">
@@ -93,6 +117,11 @@ const LoginForm = () => {
               placeholder="Введите пароль"
               disabled={isLoading}
             />
+            {localErrors.password && (
+              <div className="error-message field-error">
+                {localErrors.password}
+              </div>
+            )}
           </div>
 
           <div className="form-actions">
