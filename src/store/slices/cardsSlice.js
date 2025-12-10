@@ -188,5 +188,5 @@ const cardsSlice = createSlice({
   }
 });
 
-export const { clearError } = cardsSlice.actions;  // cardsSlice с маленькой c!
-export default cardsSlice.reducer;  // cardsSlice с маленькой c!
+export const { clearError } = cardsSlice.actions;
+export default cardsSlice.reducer;  

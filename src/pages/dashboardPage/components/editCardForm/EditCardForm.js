@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import './AddCardForm.css'; // Можно использовать тот же CSS
+import '../addCardForm/AddCardForm.css'; // Можно использовать тот же CSS
 
 const EditCardForm = ({ card, onUpdateCard, onCancel }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
