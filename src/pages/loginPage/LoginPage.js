@@ -7,7 +7,6 @@ import './LoginPage.css';
 const LoginPage = () => {
   const { isAuthenticated } = useSelector(state => state.auth);
 
-  // Если уже авторизован - редирект на главную
   if (isAuthenticated) {
     return <Navigate to="/" replace />;
   }

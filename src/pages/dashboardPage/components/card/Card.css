@@ -164,3 +164,140 @@
   font-weight: bold;
   font-size: 14px;
 }
+
+/* Режим редактирования */
+.card-edit-mode {
+  padding: 10px;
+}
+
+.edit-input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 2px solid #2196F3;
+  border-radius: 4px;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.edit-textarea {
+  width: 100%;
+  height: 100px;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 2px solid #2196F3;
+  border-radius: 4px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.btn-save {
+  padding: 8px 16px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  padding: 8px 16px;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.card[data-editing="true"] {
+  border: 2px solid #2196F3;
+  box-shadow: 0 0 10px rgba(33, 150, 243, 0.3);
+}
+
+/* Редактирование тегов */
+.tags-edit-section {
+  margin-bottom: 15px;
+}
+
+.tags-edit-section label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.current-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.tag-edit {
+  display: inline-flex;
+  align-items: center;
+  background: #e0e0e0;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  margin-left: 5px;
+  font-size: 1.2rem;
+  padding: 0 4px;
+}
+
+.tag-remove:hover {
+  color: #f44336;
+}
+
+.add-tag-input {
+  display: flex;
+  gap: 5px;
+}
+
+.add-tag-input input {
+  flex: 1;
+  padding: 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.btn-add-tag {
+  padding: 6px 12px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Выбор статуса */
+.status-edit-section {
+  margin-bottom: 15px;
+}
+
+.status-edit-section label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.status-select {
+  width: 100%;
+  padding: 8px;
+  border: 2px solid #2196F3;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+}

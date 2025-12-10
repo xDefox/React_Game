@@ -12,7 +12,6 @@ const AddCardForm = ({ onAddCard, onCancel }) => {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
 
-  // Добавляем класс к body при открытии формы
   useEffect(() => {
     document.body.classList.add('form-open');
     return () => {

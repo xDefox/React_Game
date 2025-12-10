@@ -1,13 +1,12 @@
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Navigate } from 'react-router-dom';
 import { fetchCards, addNewCard, removeCard, updateCard } from '../../store/slices/CardsSlice.js';
 import Card from './components/card/Card.js';
 import AddCardForm from './components/addCardForm/AddCardForm.js';
-import EditCardForm from './components/editCardForm/EditCardForm.js';
 import DeleteConfirmationModal from '../../components/modal/deleteModal/DeleteConfirmationModal';
 import { logout } from '../../store/slices/AuthSlice';
-import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux'; 
-import { Navigate } from 'react-router-dom'; 
-
+import './DashboardPage.css'
 
 const DashboardPage = () => {
   const dispatch = useDispatch();
@@ -15,9 +14,7 @@ const DashboardPage = () => {
   const { items: cards, isLoading } = useSelector(state => state.cards);
   
   const [showForm, setShowForm] = useState(false);
-  const [showEditForm, setShowEditForm] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [editingCard, setEditingCard] = useState(null);
   const [deletingCard, setDeletingCard] = useState(null);
   const [filter, setFilter] = useState('all');
 
@@ -63,15 +60,9 @@ const DashboardPage = () => {
     setDeletingCard(null);
   };
 
-  const handleEditCard = (card) => {
-    setEditingCard(card);
-    setShowEditForm(true);
-  };
-
+  // ✅ ДОБАВЬ ЭТУ ФУНКЦИЮ
   const handleUpdateCard = (updatedCard) => {
     dispatch(updateCard(updatedCard));
-    setShowEditForm(false);
-    setEditingCard(null);
   };
 
   const filteredCards = cards.filter(card => {
@@ -158,25 +149,13 @@ const DashboardPage = () => {
                 key={card.id}
                 item={card}
                 onDelete={user.role === 'admin' ? () => handleDeleteClick(card) : null}
-                onEdit={() => handleEditCard(card)}
+                onEdit={(updatedCard) => handleUpdateCard(updatedCard)}  // ✅ Исправлено
                 canEdit={user.role === 'admin' || card.author === user.username}
               />
             ))}
           </div>
         )}
       </main>
-
-      {/* МОДАЛКА РЕДАКТИРОВАНИЯ */}
-      {showEditForm && editingCard && (
-        <EditCardForm
-          card={editingCard}
-          onUpdateCard={handleUpdateCard}
-          onCancel={() => {
-            setShowEditForm(false);
-            setEditingCard(null);
-          }}
-        />
-      )}
 
       {/* МОДАЛКА ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ */}
       <DeleteConfirmationModal
