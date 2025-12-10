@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import LoginForm from '../components/LoginForm';
+import LoginForm from '../../components/loginform/LoginForm.js';
 import './LoginPage.css';
 
 const LoginPage = () => {

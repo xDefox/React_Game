@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import { loginUser, clearError } from '../store/slices/authSlice';
+import { loginUser, clearError } from '../../store/slices/AuthSlice';
 import { CircularProgress, Box } from '@mui/material';
 import './LoginForm.css';
 

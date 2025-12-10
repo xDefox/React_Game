@@ -1,9 +1,10 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Layout from '../components/Layout';
-import LoginPage from '../pages/LoginPage';
-import DashboardPage from '../pages/DashboardPage';
-import NotFoundPage from '../pages/NotFoundPage';
+import Layout from '../components/layout/Layout';
+import LoginPage from '../pages/loginPage';               
+import DashboardPage from '../pages/dashboardPage';        
+import NotFoundPage from '../pages/notFoundPage';         
+
 
 const AppRouter = () => {
   return (

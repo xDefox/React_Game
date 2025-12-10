@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { Navigate } from 'react-router-dom';
-import { fetchCards, addNewCard, removeCard, updateCard } from '../store/slices/cardsSlice';
-import Card from '../components/Card';
-import AddCardForm from '../components/AddCardForm';
-import EditCardForm from '../components/EditCardForm';
-import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
-import { logout } from '../store/slices/authSlice';
-import './DashboardPage.css';
+import { fetchCards, addNewCard, removeCard, updateCard } from '../../store/slices/CardsSlice.js';
+import Card from '../../components/Card.js';
+import AddCardForm from '../../components/AddCardForm';
+import EditCardForm from '../../components/EditCardForm';
+import DeleteConfirmationModal from '../../components/modal/deleteModal/DeleteConfirmationModal';
+import { logout } from '../../store/slices/AuthSlice';
+import React, { useEffect, useState } from 'react';  // Добавь useState и useEffect
+import { useSelector, useDispatch } from 'react-redux';  // Добавь эти импорты
+import { Navigate } from 'react-router-dom';  // Navigate уже есть, но проверь
+
 
 const DashboardPage = () => {
   const dispatch = useDispatch();
