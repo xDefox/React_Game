@@ -1,91 +1,21 @@
-/* DashboardPage.css */
 .dashboard-page {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 0;
-  position: relative;
+  min-height: calc(100vh - 200px);
 }
 
-/* Когда форма открыта - затемняем основной контент */
-.dashboard-page.form-open .dashboard-main {
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-.app-header {
+.filter-panel {
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: white;
-  padding: 20px 30px;
-  border-radius: 0 0 12px 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 25px;
-}
-
-.header-left h1 {
-  margin: 0 0 10px 0;
-  color: #2c3e50;
-  font-size: 28px;
-}
-
-.user-info {
-  display: inline-block;
-  background: #4a6fa5;
-  color: white;
-  padding: 5px 15px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.header-actions {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-}
-
-.btn-add, .btn-logout {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-  transition: all 0.3s;
-}
-
-.btn-add {
-  background: #4CAF50;
-  color: white;
-}
-
-.btn-add:hover:not(:disabled) {
-  background: #45a049;
-  transform: translateY(-2px);
-}
-
-.btn-add:disabled {
-  background: #b0bec5;
-  cursor: not-allowed;
-}
-
-.btn-logout {
-  background: #ff6b6b;
-  color: white;
-}
-
-.btn-logout:hover {
-  background: #ff5252;
-  transform: translateY(-2px);
-}
-
-.filter-panel {
-  background: white;
   padding: 20px;
   border-radius: 12px;
-  margin: 0 25px 25px 25px;
+  margin-bottom: 25px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dark-theme .filter-panel {
+  background: #16213e;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .filter-buttons {
@@ -104,9 +34,20 @@
   transition: all 0.3s;
 }
 
+.dark-theme .filter-btn {
+  background: #0f3460;
+  border-color: #0f3460;
+  color: #e0e0e0;
+}
+
 .filter-btn:hover {
   border-color: #4a6fa5;
   color: #4a6fa5;
+}
+
+.dark-theme .filter-btn:hover {
+  border-color: #bb86fc;
+  color: #bb86fc;
 }
 
 .filter-btn.active {
@@ -115,8 +56,39 @@
   border-color: #4a6fa5;
 }
 
+.dark-theme .filter-btn.active {
+  background: #bb86fc;
+  color: #16213e;
+  border-color: #bb86fc;
+}
+
+.btn-add-card {
+  padding: 10px 20px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.btn-add-card:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+}
+
+.dark-theme .btn-add-card {
+  background: #00b894;
+}
+
+.dark-theme .btn-add-card:hover {
+  background: #00a085;
+}
+
 .dashboard-main {
-  padding: 20px;
+  padding: 20px 0;
 }
 
 .cards-container {
@@ -134,6 +106,10 @@
   color: #546e7a;
 }
 
+.dark-theme .loading-message {
+  color: #a0a0a0;
+}
+
 .spinner {
   font-size: 48px;
   margin-bottom: 20px;
@@ -146,10 +122,14 @@
 }
 
 @media (max-width: 768px) {
-  .app-header {
+  .filter-panel {
     flex-direction: column;
-    gap: 20px;
-    text-align: center;
+    gap: 15px;
+    align-items: stretch;
+  }
+  
+  .filter-buttons {
+    justify-content: center;
   }
   
   .cards-container {

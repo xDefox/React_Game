@@ -5,7 +5,6 @@ import { fetchCards, addNewCard, removeCard, updateCard } from '../../store/slic
 import Card from './components/card/Card.js';
 import AddCardForm from './components/addCardForm/AddCardForm.js';
 import DeleteConfirmationModal from '../../components/modal/deleteModal/DeleteConfirmationModal';
-import { logout } from '../../store/slices/AuthSlice';
 import './DashboardPage.css'
 
 const DashboardPage = () => {
@@ -27,10 +26,6 @@ const DashboardPage = () => {
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-
-  const handleLogout = () => {
-    dispatch(logout());
-  };
 
   const handleAddCard = (newCard) => {
     dispatch(addNewCard({
@@ -60,7 +55,6 @@ const DashboardPage = () => {
     setDeletingCard(null);
   };
 
-  // ✅ ДОБАВЬ ЭТУ ФУНКЦИЮ
   const handleUpdateCard = (updatedCard) => {
     dispatch(updateCard(updatedCard));
   };
@@ -74,28 +68,6 @@ const DashboardPage = () => {
 
   return (
     <div className="dashboard-page">
-      <header className="app-header">
-        <div className="header-left">
-          <h1>Менеджер карточек</h1>
-          <span className="user-info">
-            {user.username} ({user.role === 'admin' ? 'Админ' : 'Пользователь'})
-          </span>
-        </div>
-        
-        <div className="header-actions">
-          <button 
-            className="btn-add"
-            onClick={() => setShowForm(true)}
-            disabled={user.role !== 'admin'}
-          >
-            + Добавить карточку
-          </button>
-          <button className="btn-logout" onClick={handleLogout}>
-            Выйти
-          </button>
-        </div>
-      </header>
-
       <div className="filter-panel">
         <div className="filter-buttons">
           <button 
@@ -123,9 +95,18 @@ const DashboardPage = () => {
             Архив
           </button>
         </div>
+
+        {user.role === 'admin' && (
+          <button 
+            className="btn-add-card"
+            onClick={() => setShowForm(true)}
+          >
+            + Добавить карточку
+          </button>
+        )}
       </div>
 
-      {/* ФОРМА ДОБАВЛЕНИЯ КАРТОЧКИ - ПОЯВЛЯЕТСЯ ПОВЕРХ */}
+      {/* ФОРМА ДОБАВЛЕНИЯ КАРТОЧКИ */}
       {showForm && (
         <AddCardForm
           onAddCard={(newCard) => {
@@ -149,7 +130,7 @@ const DashboardPage = () => {
                 key={card.id}
                 item={card}
                 onDelete={user.role === 'admin' ? () => handleDeleteClick(card) : null}
-                onEdit={(updatedCard) => handleUpdateCard(updatedCard)}  // ✅ Исправлено
+                onEdit={handleUpdateCard}
                 canEdit={user.role === 'admin' || card.author === user.username}
               />
             ))}
