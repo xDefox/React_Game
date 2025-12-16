@@ -4,13 +4,36 @@ import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { loginUser, clearError } from '../../store/slices/AuthSlice';
-import { CircularProgress, Box } from '@mui/material';
-import './LoginForm.css';
+import {
+  TextField,
+  Button,
+  CircularProgress,
+  Box,
+  Alert,
+  Typography,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+
+
+// Стилизованный компонент для Field
+const StyledTextField = ({ field, form, ...props }) => (
+  <TextField
+    {...field}
+    {...props}
+    error={form.touched[field.name] && !!form.errors[field.name]}
+    helperText={form.touched[field.name] && form.errors[field.name]}
+    fullWidth
+    variant="outlined"
+  />
+);
 
 const LoginForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isLoading, error, isAuthenticated } = useSelector(state => state.auth);
+  const [showPassword, setShowPassword] = React.useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -24,7 +47,6 @@ const LoginForm = () => {
     };
   }, [dispatch]);
 
-  //валидахтунг
   const validationSchema = Yup.object({
     username: Yup.string()
       .required('Введите имя пользователя')
@@ -34,90 +56,131 @@ const LoginForm = () => {
       .min(4, 'Минимум 4 символа')
   });
 
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <div className="login-form-container">
-      <div className="login-form-wrapper">
-        <div className="login-header">
-          <h2>Вход в систему</h2>
-        </div>
+    <Box
+      sx={{
+        width: '100%',
+        maxWidth: 400,
+        mx: 'auto',
+        p: 4,
+      }}
+    >
+      <Typography 
+        variant="h4" 
+        component="h1" 
+        align="center" 
+        sx={{ 
+          mb: 3,
+          fontWeight: 600,
+          color: 'primary.main'
+        }}
+      >
+        Вход в систему
+      </Typography>
 
-        <Formik
-          initialValues={{ username: '', password: '' }}
-          validationSchema={validationSchema}
-          onSubmit={(values) => {
-            dispatch(loginUser(values));
-          }}
-        >
-          {({ errors, touched }) => (
-            <Form className="login-form">
-              {error && (
-                <div className="error-message general-error">
-                  {error}
-                </div>
+      <Formik
+        initialValues={{ username: '', password: '' }}
+        validationSchema={validationSchema}
+        onSubmit={(values) => {
+          dispatch(loginUser(values));
+        }}
+      >
+        {({ errors, touched, isSubmitting }) => (
+          <Form>
+            {error && (
+              <Alert 
+                severity="error" 
+                sx={{ mb: 2 }}
+              >
+                {error}
+              </Alert>
+            )}
+
+            <Box sx={{ mb: 3 }}>
+              <Field
+                name="username"
+                component={StyledTextField}
+                label="Имя пользователя"
+                placeholder="Введите имя пользователя"
+                disabled={isLoading}
+                sx={{ mb: 2 }}
+              />
+            </Box>
+
+            <Box sx={{ mb: 3 }}>
+              <Field
+                name="password"
+                component={StyledTextField}
+                label="Пароль"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Введите пароль"
+                disabled={isLoading}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
+
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              size="large"
+              disabled={isLoading}
+              sx={{
+                mb: 3,
+                py: 1.5,
+                borderRadius: 2,
+                fontWeight: 600,
+              }}
+            >
+              {isLoading ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                  <CircularProgress size={20} sx={{ color: 'white' }} />
+                  <span>Вход...</span>
+                </Box>
+              ) : (
+                'Войти'
               )}
+            </Button>
 
-              <div className="form-group">
-                <label htmlFor="username">Имя пользователя</label>
-                <Field
-                  type="text"
-                  id="username"
-                  name="username"
-                  placeholder="Введите имя пользователя"
-                  disabled={isLoading}
-                />
-                {errors.username && touched.username && (
-                  <div className="error-message">
-                    {errors.username}
-                  </div>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="password">Пароль</label>
-                <Field
-                  type="password"
-                  id="password"
-                  name="password"
-                  placeholder="Введите пароль"
-                  disabled={isLoading}
-                />
-                {errors.password && touched.password && (
-                  <div className="error-message">
-                    {errors.password}
-                  </div>
-                )}
-              </div>
-
-              <div className="form-actions">
-                <button 
-                  type="submit" 
-                  className="btn-login"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                      <CircularProgress 
-                        size={20} 
-                        sx={{ color: 'white' }} 
-                      />
-                      <span>Вход...</span>
-                    </Box>
-                  ) : (
-                    'Войти'
-                  )}
-                </button>
-              </div>
-
-              <div className="login-hint">
-                <p><strong>Тестовые аккаунты:</strong></p>
-                <p>Админ: <code>admin</code> / <code>admin</code></p>
-                <p>Пользователь: <code>user</code> / <code>user</code></p>
-              </div>
-            </Form>
-          )}
-        </Formik>
-      </div>
-    </div>
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                bgcolor: 'background.default',
+                border: 1,
+                borderColor: 'divider',
+              }}
+            >
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                Тестовые аккаунты:
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Админ: <code>admin</code> / <code>admin</code>
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Пользователь: <code>user</code> / <code>user</code>
+              </Typography>
+            </Box>
+          </Form>
+        )}
+      </Formik>
+    </Box>
   );
 };
 

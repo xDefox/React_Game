@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import './AddCardForm.css';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Box,
+  Typography,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from '@mui/material';
 
 const AddCardForm = ({ onAddCard, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -131,115 +144,136 @@ const AddCardForm = ({ onAddCard, onCancel }) => {
     return Object.keys(validateForm()).length === 0;
   };
 
+  const hasError = (field) => {
+    return errors[field] && touched[field];
+  };
+
+  const getHelperText = (field) => {
+    return hasError(field) ? errors[field] : '';
+  };
+
   return (
     <>
-      <div className="form-overlay" onClick={onCancel} />
-      <div className="form-container">
-        <h2>Добавить новую карточку</h2>
+      <Box
+        sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          zIndex: 1300,
+        }}
+        onClick={onCancel}
+      />
+      <Dialog 
+        open 
+        onClose={onCancel}
+        maxWidth="sm"
+        fullWidth
+        sx={{
+          '& .MuiDialog-paper': {
+            borderRadius: 2,
+          }
+        }}
+        BackdropProps={{
+          style: { backgroundColor: 'transparent' }
+        }}
+      >
+        <DialogTitle sx={{ borderBottom: 1, borderColor: 'divider', pb: 2 }}>
+          Добавить новую карточку
+        </DialogTitle>
         
-        <form onSubmit={handleSubmit} className="card-form" noValidate>
-          <div className="form-group">
-            <label htmlFor="title" className="required">
-              Заголовок
-            </label>
-            <input
-              type="text"
-              id="title"
+        <DialogContent sx={{ pt: 3 }}>
+          <Box component="form" onSubmit={handleSubmit} noValidate>
+            {/* Заголовок */}
+            <TextField
+              autoFocus
+              margin="normal"
               name="title"
+              label="Заголовок *"
+              type="text"
+              fullWidth
               value={formData.title}
               onChange={handleChange}
               onBlur={handleBlur}
-              placeholder="Введите заголовок карточки..."
-              className={`form-input ${errors.title && touched.title ? 'error' : ''}`}
+              error={hasError('title')}
+              helperText={getHelperText('title')}
               required
+              sx={{ mb: 2 }}
             />
-            {errors.title && touched.title && (
-              <div className="error-message">{errors.title}</div>
-            )}
-            <div className="character-count">
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
               {formData.title.length}/50 символов
-            </div>
-          </div>
+            </Typography>
 
-          <div className="form-group">
-            <label htmlFor="description">
-              Описание
-            </label>
-            <textarea
-              id="description"
+            {/* Описание */}
+            <TextField
+              margin="normal"
               name="description"
+              label="Описание"
+              type="text"
+              fullWidth
+              multiline
+              rows={4}
               value={formData.description}
               onChange={handleChange}
               onBlur={handleBlur}
-              placeholder="Введите описание задачи или сущности..."
-              rows="4"
-              className={`form-textarea ${errors.description && touched.description ? 'error' : ''}`}
+              error={hasError('description')}
+              helperText={getHelperText('description')}
+              sx={{ mb: 2 }}
             />
-            {errors.description && touched.description && (
-              <div className="error-message">{errors.description}</div>
-            )}
-            <div className="character-count">
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
               {formData.description.length}/500 символов
-            </div>
-          </div>
+            </Typography>
 
-          <div className="form-group">
-            <label htmlFor="tags">
-              Теги (через запятую)
-            </label>
-            <input
-              type="text"
-              id="tags"
+            {/* Теги */}
+            <TextField
+              margin="normal"
               name="tags"
+              label="Теги (через запятую)"
+              type="text"
+              fullWidth
               value={formData.tags}
               onChange={handleChange}
               onBlur={handleBlur}
-              placeholder="React, JavaScript, CSS, UI, Design"
-              className={`form-input ${errors.tags && touched.tags ? 'error' : ''}`}
+              error={hasError('tags')}
+              helperText={getHelperText('tags') || 'Можно указать до 5 тегов через запятую'}
+              sx={{ mb: 2 }}
             />
-            {errors.tags && touched.tags && (
-              <div className="error-message">{errors.tags}</div>
-            )}
-            <div className="form-hint">
-              Можно указать до 5 тегов через запятую
-            </div>
-          </div>
 
-          <div className="form-group">
-            <label htmlFor="status">
-              Статус
-            </label>
-            <select
-              id="status"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="form-select"
-            >
-              <option value="active">Активно</option>
-              <option value="paused">На паузе</option>
-              <option value="completed">Завершено</option>
-            </select>
-          </div>
-
-          <div className="form-actions">
-            <button 
-              type="button" 
-              onClick={onCancel} 
-              className="btn-cancel"
-            >
-              Отмена
-            </button>
-            <button 
-              type="submit" 
-              className={`btn-submit ${!isFormValid() ? 'disabled' : ''}`}
-              disabled={!isFormValid()}
-            >
-              {isFormValid() ? 'Сохранить карточку' : 'Исправьте ошибки'}
-            </button>
-          </div>
-        </form>
-      </div>
+            {/* Статус */}
+            <FormControl fullWidth margin="normal" sx={{ mb: 2 }}>
+              <InputLabel>Статус</InputLabel>
+              <Select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                label="Статус"
+              >
+                <MenuItem value="active">Активно</MenuItem>
+                <MenuItem value="paused">На паузе</MenuItem>
+                <MenuItem value="archived">Завершено</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        </DialogContent>
+        
+        <DialogActions sx={{ px: 3, pb: 3, borderTop: 1, borderColor: 'divider', pt: 2 }}>
+          <Button 
+            onClick={onCancel} 
+            variant="outlined"
+          >
+            Отмена
+          </Button>
+          <Button 
+            onClick={handleSubmit} 
+            variant="contained"
+            disabled={!isFormValid()}
+          >
+            {isFormValid() ? 'Сохранить карточку' : 'Исправьте ошибки'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

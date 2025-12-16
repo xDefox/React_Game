@@ -1,11 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Navigate } from 'react-router-dom';
+import {
+  SectionBox,
+  PageContainer,
+  FilterButton,
+  AddButton,
+  GradientTypography,
+} from '../../theme';
+import {
+  Box,
+  Grid,
+  CircularProgress,
+  Typography,
+} from '@mui/material';
 import { fetchCards, addNewCard, removeCard, updateCard } from '../../store/slices/CardsSlice.js';
 import Card from './components/card/Card.js';
 import AddCardForm from './components/addCardForm/AddCardForm.js';
 import DeleteConfirmationModal from '../../components/modal/deleteModal/DeleteConfirmationModal';
-import './DashboardPage.css'
 
 const DashboardPage = () => {
   const dispatch = useDispatch();
@@ -66,86 +78,140 @@ const DashboardPage = () => {
     return true;
   });
 
+  const filterButtons = [
+    { key: 'all', label: 'Все карточки' },
+    { key: 'my', label: 'Мои карточки' },
+    { key: 'active', label: 'Активные' },
+    { key: 'archived', label: 'Архив' },
+  ];
+
   return (
-    <div className="dashboard-page">
-      <div className="filter-panel">
-        <div className="filter-buttons">
-          <button 
-            className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-            onClick={() => setFilter('all')}
-          >
-            Все карточки
-          </button>
-          <button 
-            className={`filter-btn ${filter === 'my' ? 'active' : ''}`}
-            onClick={() => setFilter('my')}
-          >
-            Мои карточки
-          </button>
-          <button 
-            className={`filter-btn ${filter === 'active' ? 'active' : ''}`}
-            onClick={() => setFilter('active')}
-          >
-            Активные
-          </button>
-          <button 
-            className={`filter-btn ${filter === 'archived' ? 'active' : ''}`}
-            onClick={() => setFilter('archived')}
-          >
-            Архив
-          </button>
-        </div>
-
-        {user.role === 'admin' && (
-          <button 
-            className="btn-add-card"
-            onClick={() => setShowForm(true)}
-          >
-            + Добавить карточку
-          </button>
-        )}
-      </div>
-
-      {/* ФОРМА ДОБАВЛЕНИЯ КАРТОЧКИ */}
-      {showForm && (
-        <AddCardForm
-          onAddCard={(newCard) => {
-            handleAddCard(newCard);
-            setShowForm(false);
-          }}
-          onCancel={() => setShowForm(false)}
-        />
-      )}
-
-      <main className="dashboard-main">
-        {isLoading ? (
-          <div className="loading-message">
-            <div className="spinner">⏳</div>
-            <p>Загрузка карточек...</p>
-          </div>
-        ) : (
-          <div className="cards-container">
-            {filteredCards.map((card) => (
-              <Card
-                key={card.id}
-                item={card}
-                onDelete={user.role === 'admin' ? () => handleDeleteClick(card) : null}
-                onEdit={handleUpdateCard}
-                canEdit={user.role === 'admin' || card.author === user.username}
-              />
+    <PageContainer>
+      <SectionBox>
+        {/* Панель фильтров */}
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 2,
+          mb: 3,
+          p: 2,
+          borderRadius: 2,
+          backgroundColor: 'background.default',
+          border: 1,
+          borderColor: 'divider'
+        }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            {filterButtons.map((btn) => (
+              <FilterButton
+                key={btn.key}
+                active={filter === btn.key}
+                onClick={() => setFilter(btn.key)}
+                size="small"
+              >
+                {btn.label}
+              </FilterButton>
             ))}
-          </div>
-        )}
-      </main>
+          </Box>
 
-      {/* МОДАЛКА ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ */}
+          {user.role === 'admin' && (
+            <AddButton
+              onClick={() => setShowForm(true)}
+              size="medium"
+            >
+              + Добавить карточку
+            </AddButton>
+          )}
+        </Box>
+
+        {/* Форма добавления карточки */}
+        {showForm && (
+          <AddCardForm
+            onAddCard={(newCard) => {
+              handleAddCard(newCard);
+              setShowForm(false);
+            }}
+            onCancel={() => setShowForm(false)}
+          />
+        )}
+
+        {/* Карточки */}
+        {isLoading ? (
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column',
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            height: '300px',
+            color: 'text.secondary'
+          }}>
+            <CircularProgress size={60} sx={{ mb: 2 }} />
+            <Typography variant="h6">Загрузка карточек...</Typography>
+          </Box>
+        ) : (
+          <Grid container spacing={3}>
+            {filteredCards.length > 0 ? (
+              filteredCards.map((card) => (
+                <Grid item xs={12} sm={6} md={4} lg={3} key={card.id}>
+                  <Card
+                    item={card}
+                    onDelete={user.role === 'admin' ? () => handleDeleteClick(card) : null}
+                    onEdit={handleUpdateCard}
+                    canEdit={user.role === 'admin' || card.author === user.username}
+                  />
+                </Grid>
+              ))
+            ) : (
+              <Grid item xs={12}>
+                <Box sx={{ 
+                  textAlign: 'center', 
+                  py: 8,
+                  color: 'text.secondary'
+                }}>
+                  <Typography variant="h6" gutterBottom>
+                    Карточек не найдено
+                  </Typography>
+                  <Typography variant="body2">
+                    {filter === 'my' 
+                      ? 'У вас нет своих карточек'
+                      : filter === 'active'
+                      ? 'Нет активных карточек'
+                      : filter === 'archived'
+                      ? 'Нет карточек в архиве'
+                      : 'Карточек пока нет'}
+                  </Typography>
+                </Box>
+              </Grid>
+            )}
+          </Grid>
+        )}
+
+        {/* Статистика */}
+        {!isLoading && filteredCards.length > 0 && (
+          <Box sx={{ 
+            mt: 4, 
+            p: 2, 
+            borderRadius: 2,
+            backgroundColor: 'background.default',
+            border: 1,
+            borderColor: 'divider'
+          }}>
+            <Typography variant="body2" color="text.secondary">
+              Показано: {filteredCards.length} из {cards.length} карточек
+            </Typography>
+          </Box>
+        )}
+      </SectionBox>
+
+      {/* Модалка подтверждения удаления */}
       <DeleteConfirmationModal
         open={showDeleteModal}
         onClose={handleCancelDelete}
         onConfirm={handleConfirmDelete}
         cardTitle={deletingCard?.title}
       />
-    </div>
+    </PageContainer>
   );
 };
 
