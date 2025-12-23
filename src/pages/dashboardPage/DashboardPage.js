@@ -6,23 +6,28 @@ import {
   PageContainer,
   FilterButton,
   AddButton,
-  GradientTypography,
 } from '../../theme';
 import {
   Box,
   Grid,
   CircularProgress,
   Typography,
+  Button, 
 } from '@mui/material';
 import { fetchCards, addNewCard, removeCard, updateCard } from '../../store/slices/CardsSlice.js';
 import Card from './components/card/Card.js';
 import AddCardForm from './components/addCardForm/AddCardForm.js';
 import DeleteConfirmationModal from '../../components/modal/deleteModal/DeleteConfirmationModal';
 
+import { useTheme } from '../../theme/themeContext/ThemeContext'; 
+
 const DashboardPage = () => {
+  const { mode, toggleTheme } = useTheme();
   const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector(state => state.auth);
   const { items: cards, isLoading } = useSelector(state => state.cards);
+
+  
   
   const [showForm, setShowForm] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -71,6 +76,37 @@ const DashboardPage = () => {
     dispatch(updateCard(updatedCard));
   };
 
+  const MuiStandardButton = () => {
+  const { toggleTheme, mode } = useTheme();
+
+  return (
+    <Box sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2, mb: 3 }}>
+      <Typography variant="subtitle2" sx={{ mb: 2 }}>
+        Стандартные MUI маркеры (без ручной настройки цветов):
+      </Typography>
+      
+      <Button 
+        variant="contained" 
+        color="primary"      // Ключ: MUI сам выберет цвет из палитры primary
+        onClick={toggleTheme}
+        sx={{
+          // Используем только системные токены
+          bgcolor: 'secondary.main', 
+          color: 'secondary.contrastText', // Автоматически подберет контрастный текст
+          '&:hover': {
+            bgcolor: 'secondary.dark',
+          },
+          // Элемент будет менять цвет, так как 'divider' меняется в getTheme
+          border: '1px solid',
+          borderColor: 'divider' 
+        }}
+      >
+        Переключить тему (сейчас: {mode})
+      </Button>
+    </Box>
+  );
+};
+
   const filteredCards = cards.filter(card => {
     if (filter === 'my') return card.author === user.username || card.isMine;
     if (filter === 'active') return card.status === 'active';
@@ -102,6 +138,15 @@ const DashboardPage = () => {
           border: 1,
           borderColor: 'divider'
         }}>
+          <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
+          <Button 
+            variant="contained" 
+            color="primary"   // Чистый MUI: цвет берется из палитры автоматически
+            onClick={toggleTheme}
+          >
+            Тема: {mode === 'light' ? 'Светлая' : 'Темная'}
+          </Button>
+        </Box>
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
             {filterButtons.map((btn) => (
               <FilterButton
