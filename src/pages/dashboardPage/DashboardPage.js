@@ -85,23 +85,22 @@ const DashboardPage = () => {
         Стандартные MUI маркеры (без ручной настройки цветов):
       </Typography>
       
+      //кнопка с темой из коробки
       <Button 
         variant="contained" 
-        color="primary"      // Ключ: MUI сам выберет цвет из палитры primary
+        color="primary" 
         onClick={toggleTheme}
         sx={{
-          // Используем только системные токены
           bgcolor: 'secondary.main', 
-          color: 'secondary.contrastText', // Автоматически подберет контрастный текст
+          color: 'secondary.contrastText',
           '&:hover': {
             bgcolor: 'secondary.dark',
           },
-          // Элемент будет менять цвет, так как 'divider' меняется в getTheme
           border: '1px solid',
           borderColor: 'divider' 
         }}
       >
-        Переключить тему (сейчас: {mode})
+         Демонстрация темы (сейчас: {mode})
       </Button>
     </Box>
   );
