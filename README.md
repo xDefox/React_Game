@@ -1,70 +1,98 @@
-# Getting Started with Create React App
+# Менеджер карточек
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Веб-приложение для управления карточками задач с системой аутентификации, ролевым доступом и переключением тем (светлая/тёмная).
 
-## Available Scripts
+## Технологии
 
-In the project directory, you can run:
+- **React 18** + **Redux Toolkit** (стейт-менеджмент)
+- **React Router v6** (маршрутизация)
+- **Material UI (MUI)** (компоненты и дизайн-система)
+- **Formik + Yup** (валидация форм)
+- **localStorage** (персистентность данных)
 
-### `npm start`
+## Возможности
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- 🔐 Аутентификация (админ / пользователь)
+- 📝 CRUD-операции с карточками (создание, редактирование, удаление)
+- 🔍 Фильтрация карточек (все / мои / активные / архив)
+- 🌗 Переключение светлой/тёмной темы
+- 💾 Автосохранение в localStorage
+- 📱 Адаптивный интерфейс
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Установка и запуск
 
-### `npm test`
+```bash
+# Клонировать репозиторий
+git clone https://github.com/xDefox/React_Game.git
+cd React_Game
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+# Установить зависимости
+npm install
 
-### `npm run build`
+# Запустить dev-сервер
+npm start
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Приложение откроется на [http://localhost:3000](http://localhost:3000).
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Сборка
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+npm run build
+```
 
-### `npm run eject`
+Статика соберётся в папке `build/`.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Тестовые аккаунты
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+| Роль       | Логин  | Пароль |
+|------------|--------|--------|
+| Админ      | admin  | admin  |
+| Пользователь| user   | user   |
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Структура проекта
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```
+src/
+├── components/          # Переиспользуемые компоненты
+│   ├── layout/          # Шапка и обёртка страниц
+│   ├── loginform/       # Форма входа
+│   └── modal/           # Модальные окна
+├── pages/               # Страницы приложения
+│   ├── loginPage/       # Страница входа
+│   ├── dashboardPage/   # Главная (карточки)
+│   └── notFoundPage/    # 404
+├── router/              # Маршрутизация
+├── store/               # Redux store + slices
+│   ├── slices/
+│   │   ├── AuthSlice.js # Аутентификация
+│   │   └── CardsSlice.js# Карточки
+│   └── index.js
+├── theme/               # Темизация
+│   ├── themeContext/    # React Context для темы
+│   └── MuiThemeProvider.js
+└── App.js
+```
 
-## Learn More
+## Архитектура стейта
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### AuthSlice
+- `user` — текущий пользователь (username, role)
+- `isAuthenticated` — статус авторизации
+- `isLoading`, `error` — UI-состояния
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### CardsSlice
+- `items` — массив карточек
+- `isLoading`, `error` — UI-состояния
+- Асинхронные thunks: `fetchCards`, `addNewCard`, `removeCard`, `updateCard`
 
-### Code Splitting
+## Особенности реализации
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- **Ролевая модель**: админ может создавать и удалять любые карточки, пользователь — только свои.
+- **Тема**: реализована через два провайдера — `ThemeProvider` (кастомный контекст) + `MuiThemeProvider` (Material UI).
+- **Данные**: имитация API через `setTimeout`, с fallback на `localStorage`.
+- **Валидация**: форма входа валидируется через Yup (минимум 3 символа для логина, 4 для пароля).
 
-### Analyzing the Bundle Size
+## Лицензия
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+MIT
